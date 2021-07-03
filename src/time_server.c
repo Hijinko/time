@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -36,25 +37,38 @@ int main(void)
     // listen for connections
     printf("listening on socket...\n");
     listen(h_server_socket, 5);
+   
+    // keep server alive
+    // server will close with Ctrl-D
+    while(true){
+        // accept connections
+        int h_client_socket = accept(h_server_socket, (struct sockaddr *)&server_addr_t, &server_len);
+        if (h_client_socket < 0){
+            perror("error accepting connection ");
+            exit(EXIT_FAILURE);
+        }
 
-    // accept connections
-    int h_client_socket = accept(h_server_socket, (struct sockaddr *)&server_addr_t, &server_len);
-    if (h_client_socket < 0){
-        perror("error accepting connection ");
-        exit(EXIT_FAILURE);
+        // create a new fork
+        int pid = fork();
+        if (pid < 0){
+            perror("error creating fork ");
+        }
+
+        if (pid == 0){
+            // send data to client
+            printf("sending data to client...\n");
+            char * p_server_data = time_get(); 
+            if (send(h_client_socket, p_server_data, strlen(p_server_data), 0) < 0){
+                perror("error sending data ");
+                exit(EXIT_FAILURE);
+            }
+            exit(EXIT_SUCCESS);
+        }
+        else {
+            // close client socket
+            close(h_client_socket);
+        }
     }
-
-    // send data to client
-    printf("sending data to client...\n");
-    char * p_server_data = time_get(); 
-    if (send(h_client_socket, p_server_data, strlen(p_server_data), 0) < 0){
-        perror("error sending data ");
-        exit(EXIT_FAILURE);
-    }
-
-    // close sockets
-    close(h_server_socket);
-    close(h_client_socket);
 }
 // end of file
 
