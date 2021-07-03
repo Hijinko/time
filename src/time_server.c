@@ -23,12 +23,14 @@ int main(void)
     int h_server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (h_server_socket < 0){
         perror("error creating socket ");
+        exit(EXIT_FAILURE);
     }
 
     // bind to server to socket
     printf("binding socket...\n");
     if (bind(h_server_socket, (struct sockaddr *)&server_addr_t, server_len) < 0){
         perror("error binding socket ");
+        exit(EXIT_FAILURE);
     }
 
     // listen for connections
@@ -39,6 +41,7 @@ int main(void)
     int h_client_socket = accept(h_server_socket, (struct sockaddr *)&server_addr_t, &server_len);
     if (h_client_socket < 0){
         perror("error accepting connection ");
+        exit(EXIT_FAILURE);
     }
 
     // send data to client
@@ -46,6 +49,7 @@ int main(void)
     char * p_server_data = time_get(); 
     if (send(h_client_socket, p_server_data, strlen(p_server_data), 0) < 0){
         perror("error sending data ");
+        exit(EXIT_FAILURE);
     }
 
     // close sockets
