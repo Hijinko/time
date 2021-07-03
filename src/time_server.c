@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 int main(void)
 {
@@ -35,7 +36,9 @@ int main(void)
     }
 
     // listen for connections
-    printf("listening on socket...\n");
+    char * p_server_ip = inet_ntoa(server_addr_t.sin_addr);
+    int server_port = ntohs(server_addr_t.sin_port);
+    printf("server listening on %s:%d...\n", p_server_ip, server_port);
     listen(h_server_socket, 5);
    
     // keep server alive
