@@ -6,9 +6,20 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
-int main(void)
+void display_usage(void){
+    printf("USAGE: time_client <server ip> <server_port>\n");
+}
+
+int main(int argc, char * argv[])
 {
+    // check the user arguments 
+    if (argc != 3){
+        display_usage();
+        exit(EXIT_SUCCESS);
+    }
+
     enum {MAX_BUFF = 256};
 
     // create server struct
@@ -16,8 +27,9 @@ int main(void)
     socklen_t server_len = sizeof(server_addr_t);
     memset(&server_addr_t, 0, server_len);
     server_addr_t.sin_family = AF_INET;
-    server_addr_t.sin_addr.s_addr = INADDR_ANY;
-    server_addr_t.sin_port = htons(8080);
+    //server_addr_t.sin_addr.s_addr = inet_aton(argv[1], server_addr_t.sin_addr.s_addr);
+    inet_aton(argv[1], &server_addr_t.sin_addr);
+    server_addr_t.sin_port = htons(atoi(argv[2]));
 
     // create socket
     printf("creating socket...\n");
