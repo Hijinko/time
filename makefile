@@ -4,8 +4,8 @@ SRC = ./src/
 INC = ./include/
 
 all: time_server time_client
-time_server: $(OBJ)time_server.o $(OBJ)time_functs.o
-	$(CMD) $(OBJ)time_server.o $(OBJ)time_functs.o -o time_server
+time_server: $(OBJ)time_server.o $(OBJ)time_functs.o $(OBJ)sc.o
+	$(CMD) $(OBJ)time_server.o $(OBJ)time_functs.o $(OBJ)sc.o -o time_server
 $(OBJ)time_server.o: $(SRC)time_server.c 
 	$(CMD) -c $(SRC)time_server.c -o $(OBJ)time_server.o
 $(OBJ)time_functs.o: $(SRC)time_functs.c $(INC)time_functs.h
@@ -18,5 +18,5 @@ $(OBJ)sc.o: $(SRC)sc.c $(INC)sc.h
 	$(CMD) -c $(SRC)sc.c -o $(OBJ)sc.o
 clean:
 	rm -rf time_server time_client $(OBJ)*.o
-debug: $(CMD) += -g
-debug: clean time_server time_client 
+debug: CMD += -g
+debug: clean all 
