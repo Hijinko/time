@@ -7,6 +7,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "../include/sc.h" 
 
 void display_usage(void){
     printf("USAGE: time_client <server ip> <server_port>\n");
@@ -23,13 +24,7 @@ int main(int argc, char * argv[])
     enum {MAX_BUFF = 256};
 
     // create server struct
-    struct sockaddr_in server_addr_t;
-    socklen_t server_len = sizeof(server_addr_t);
-    memset(&server_addr_t, 0, server_len);
-    server_addr_t.sin_family = AF_INET;
-    //server_addr_t.sin_addr.s_addr = inet_aton(argv[1], server_addr_t.sin_addr.s_addr);
-    inet_aton(argv[1], &server_addr_t.sin_addr);
-    server_addr_t.sin_port = htons(atoi(argv[2]));
+    struct sockaddr_in * p_server_addr_t  = sc_get_sockaddr_in(AF_INET, atoi(argv[2]), argv[1]);
 
     // create socket
     printf("creating socket...\n");
@@ -41,7 +36,7 @@ int main(int argc, char * argv[])
 
     // connect to socket
     printf("connecting to socket...\n");
-    if (connect(h_client_socket, (struct sockaddr *)&server_addr_t, server_len) < 0){
+    if (connect(h_client_socket, (struct sockaddr *)p_server_addr_t, sizeof(struct sockaddr_in)) < 0){
         perror("error connecting to socket ");
         exit(EXIT_FAILURE);
     }
@@ -59,5 +54,6 @@ int main(int argc, char * argv[])
 
     // close socket
     close(h_client_socket);
+    free(p_server_addr_t);
 }
 // end of file
