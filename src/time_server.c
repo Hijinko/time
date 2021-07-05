@@ -45,7 +45,10 @@ int main(void)
     // server will close with Ctrl-D
     while(true){
         // accept connections
-        int h_client_socket = accept(h_server_socket, (struct sockaddr *)&server_addr_t, &server_len);
+        struct sockaddr_in client_addr_t;
+        socklen_t client_len = sizeof(client_addr_t);
+        memset(&client_addr_t, 0, client_len);
+        int h_client_socket = accept(h_server_socket, (struct sockaddr *)&client_addr_t, &client_len);
         if (h_client_socket < 0){
             perror("error accepting connection ");
             exit(EXIT_FAILURE);
@@ -59,7 +62,7 @@ int main(void)
 
         if (pid == 0){
             // send data to client
-            printf("sending data to client...\n");
+            printf("sending data to %s:%d...\n", inet_ntoa(client_addr_t.sin_addr), ntohs(client_addr_t.sin_port));
             char * p_server_data = time_get(); 
             if (send(h_client_socket, p_server_data, strlen(p_server_data), 0) < 0){
                 perror("error sending data ");
